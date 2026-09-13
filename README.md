@@ -1,155 +1,88 @@
-#AUTO-GEAR
+AUTO-GEAR
+Local Email Automation for Python
 
-AUTO-GEAR is a lightweight, locally hosted email automation service written in Python.
+AUTO-GEAR is a lightweight Python email automation tool that lets you send, schedule, delay, and repeat emails locally through an SMTP server.
 
-It was originally developed as a network-alert email bot, but was expanded into a general-purpose tool for sending emails immediately, scheduling delayed messages, and running recurring email jobs in the background.
+It started as a simple network-alert bot. The project grew from there into a general-purpose local email automation service.
 
-The project is designed to run locally from the command line without requiring a web server or external automation platform.
+Some of the code was developed with AI assistance. The project concept, structure, frame, and overall implementation are mine.
+
+Overview
+
+AUTO-GEAR runs entirely from your local machine.
+
+Configure an SMTP account, create an email, choose when it should be sent, and let AUTO-GEAR handle the rest.
+
+┌──────────────────────────────────────────┐
+│                 AUTO-GEAR                │
+├──────────────────────────────────────────┤
+│                                          │
+│  SMTP Configuration                      │
+│          │                               │
+│          ▼                               │
+│  Create Email                            │
+│          │                               │
+│          ▼                               │
+│  Configure Schedule                      │
+│          │                               │
+│          ▼                               │
+│  Background Worker                       │
+│          │                               │
+│          ▼                               │
+│      SMTP Server                         │
+│          │                               │
+│          ▼                               │
+│       Email Sent                         │
+│                                          │
+└──────────────────────────────────────────┘
 
 Features
-Send emails through SMTP
-Support for Google/Gmail SMTP
-Support for Outlook SMTP
-Custom SMTP server support
-App-password file loading
-Manual app-password entry
-Delayed email delivery
-Recurring email delivery
-Recurring schedules based on:
+Feature	Supported
+SMTP email delivery	Yes
+Google SMTP	Yes
+Outlook SMTP	Yes
+Custom SMTP	Yes
+Delayed delivery	Yes
+Recurring delivery	Yes
+Attachments	Yes
+BCC	Yes
+Custom bot names	Yes
+App-password files	Yes
+Background execution	Yes
+Network alerts	Yes
+GUI	Not currently
+Scheduling
+
+AUTO-GEAR supports three recurring intervals:
+
 Minutes
 Hours
 Days
-Email attachments
-BCC recipients
-Custom sender/bot names
-Temporary email-content files
-Background email execution using Python threads
-SMTP connection verification before starting
-Automatic cleanup of temporary files after one-time deliveries
-How It Works
-
-AUTO-GEAR runs as a local command-line application.
-
-The general workflow is:
-
-Start AUTO-GEAR
-      |
-      v
-Select SMTP Provider
-      |
-      v
-Authenticate SMTP Account
-      |
-      v
-Verify SMTP Connection
-      |
-      v
-Main Menu
-  /       \
- /         \
-Send      System
-Email      Alert
-  |
-  v
-Configure Message
-  |
-  +--> Recipient
-  +--> Subject
-  +--> Content
-  +--> Attachment
-  +--> BCC
-  |
-  v
-Configure Schedule
-  |
-  +--> Immediate
-  +--> Delayed
-  +--> Recurring
-  |
-  v
-Background Worker
-  |
-  v
-SMTP Transmission
 
 
-The main process remains available while scheduled or recurring jobs are handled by background threads.
+You can also specify an exact date and time for the first delivery:
 
-Requirements
-Python 3.x
-An SMTP-enabled email account
-An app password or equivalent SMTP authentication method
+YYYY-MM-DD HH:MM
 
-The project currently uses Python's standard library, so no external Python packages are required.
+Example:
+2026-10-25 14:30
 
-Installation
+Example
 
-Clone the repository:
+Starting AUTO-GEAR presents the main configuration:
 
-git clone https://github.com/yourusername/auto-gear.git
-cd auto-gear
+##---Auto-Gears---##
 
-
-Run the program:
-
-python auto_gear.py
-
-
-Depending on your system, you may need:
-
-python3 auto_gear.py
-
-SMTP Configuration
-
-AUTO-GEAR currently provides three SMTP options:
+What is your SMTP service?
 
 1. Google
 2. Outlook
-3. Custom SMTP
+3. Type custom SMTP
+
+Input your choice (1, 2, or 3):
 
 
-Google uses:
-
-smtp.gmail.com:587
-
-
-Outlook uses:
-
-smtp-mail.outlook.com:587
-
-
-Custom SMTP servers can be entered manually.
-
-AUTO-GEAR establishes a TLS connection and authenticates before sending mail.
-
-Authentication
-
-AUTO-GEAR supports loading an app password from a local file.
-
-Example:
-
-/path/to/app_password.txt
-
-
-The file should contain the password without additional formatting.
-
-It can also be entered manually when starting the application.
-
-Do not commit password files, credentials, or other authentication secrets to the repository.
-
-A .gitignore entry such as the following is recommended:
-
-*.txt
-.env
-__pycache__/
-*.pyc
-
-
-If your project stores temporary files using a specific directory, it is better to ignore that directory instead of every .txt file.
-
-Sending an Email
-
-From the main menu:
+After authentication:
 
 What would you like to do:
 
@@ -158,186 +91,164 @@ What would you like to do:
 3. Exit Program
 
 
-Selecting option 1 allows you to configure an email.
+A job can then be configured with:
 
-You can specify:
-
-Bot name
+Bot Name
 Recipient
 Subject
-Email content
+Content
 Attachment
-BCC recipient
-Recurring schedule
-Delayed start time
-Delayed Emails
-
-AUTO-GEAR can delay the initial transmission of an email.
-
-Example:
-
-Enter Date & Time: 2026-10-25 14:30
-
-
-The background worker calculates the delay and waits until the specified time before transmitting the message.
-
-The expected format is:
-
-YYYY-MM-DD HH:MM
-
-Recurring Emails
-
-Emails can also be configured to repeat indefinitely.
-
-Available intervals include:
-
-Minutes
-Hours
-Days
-
-
-For example:
-
-Every 30 minutes
-Every 4 hours
-Every 2 days
-
-
-After each successful transmission, the worker calculates the next execution time and waits until the next cycle.
-
-Attachments
-
-AUTO-GEAR supports standard email attachments.
-
-During message configuration:
-
-Do you have an attachment? (y/n):
-
-
-If enabled, the program asks for the attachment's filename and adds it to the MIME message before transmission.
-
 BCC
+Recurring Schedule
+Delayed Start Time
 
-Additional recipients can be added through BCC.
 
-The primary recipient is stored separately while the BCC recipient is added to the SMTP recipient list.
+Once configured, the email is handed to a background worker.
 
-This allows the BCC recipient to receive the email without being displayed in the visible To header.
+Main Program
+     │
+     ├── Create Job
+     │
+     └── Background Thread
+              │
+              ├── Wait
+              ├── Connect
+              ├── Authenticate
+              ├── Send
+              └── Repeat / Exit
 
-Background Execution
 
-AUTO-GEAR uses Python's threading module to move scheduled email jobs into background threads.
+The main program remains available while the scheduled job waits.
 
-The worker is responsible for:
+SMTP Support
+Google
+Server: smtp.gmail.com
+Port:   587
+TLS:    Enabled
 
-Waiting for the scheduled start time.
-Establishing an SMTP connection.
-Authenticating with the SMTP server.
-Sending the email.
-Closing the SMTP connection.
-Calculating the next execution time for recurring jobs.
-Repeating until the job is stopped or the process exits.
+Outlook
+Server: smtp-mail.outlook.com
+Port:   587
+TLS:    Enabled
 
-The main program can therefore return to its menu while a scheduled job is waiting.
+Custom
+
+AUTO-GEAR also allows you to provide your own SMTP server.
+
+Authentication
+
+AUTO-GEAR supports application-specific passwords.
+
+You can either load an app password from a local file:
+
+/path/to/app_password.txt
+
+
+or enter it manually when prompted.
+
+Important
+
+Do not commit credentials to GitHub.
+
+For example, add sensitive files to .gitignore:
+
+.env
+secrets/
+__pycache__/
+*.pyc
+
+
+If you store credentials in a text file, make sure that file is excluded from version control.
+
+Installation
+Requirements
+Python 3.x
+SMTP-enabled email account
+App password or compatible SMTP credentials
+
+AUTO-GEAR currently uses Python's standard library, so there are no required third-party packages.
+
+Clone
+git clone https://github.com/USERNAME/AUTO-GEAR.git
+cd AUTO-GEAR
+
+Run
+python auto_gear.py
+
+
+Or:
+
+python3 auto_gear.py
 
 Project Structure
-
-A simple repository layout can look like:
-
 AUTO-GEAR/
 │
 ├── auto_gear.py
 ├── README.md
+├── LICENSE
 ├── .gitignore
-└── LICENSE
+│
+└── secrets/          # Local only
 
 
-Temporary email-content files and credential files should not be committed to the repository.
+The current implementation intentionally keeps the project small.
 
-Technical Notes
+How It Works
 
-The project currently relies entirely on Python's standard library.
+AUTO-GEAR uses Python's threading module to run scheduled jobs independently from the main program.
 
-Primary modules include:
+The worker:
 
-import os
-import smtplib
-import threading
-import time
-from datetime import datetime, timedelta
+Waits for the scheduled start time.
+Creates an SMTP connection.
+Starts TLS.
+Authenticates.
+Sends the message.
+Closes the connection.
+Calculates the next execution time.
+Repeats if the job is recurring.
 
-
-Email construction is handled using Python's MIME modules:
-
-from email.mime.base import MIMEBase
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-
-
-Attachments are encoded using:
-
-from email import encoders
-
-
-The original project was developed around network-alert functionality. The current implementation keeps that use case available through the system-log/alert workflow while allowing the same underlying engine to be used for general email automation.
-
-Security Considerations
-
-AUTO-GEAR handles SMTP credentials, so credential management is important.
-
-Do not:
-
-Hard-code passwords into the source code.
-Commit app-password files.
-Commit .env files containing credentials.
-Upload credentials through GitHub.
-Share SMTP credentials in issues or pull requests.
-
-For production use, credential handling should be improved beyond plain-text local files and terminal input.
+For one-time messages, the worker exits after delivery and removes the temporary content file.
 
 Current Limitations
 
-AUTO-GEAR is currently a command-line application.
+AUTO-GEAR is still an early-stage project.
 
-It does not currently provide:
+Currently:
 
-A graphical interface
-A web interface
-Persistent job storage
-A job-management database
-Job cancellation from the main menu
-Persistent schedules after the program exits
-Advanced cron-style scheduling
-Robust timezone handling
-Encrypted credential storage
-
-Scheduled and recurring jobs depend on the Python process remaining active.
-
-If AUTO-GEAR is terminated, its active background threads will also terminate.
-
-Future Development
-
-Potential future improvements include:
-
-GUI interface
-Persistent scheduled jobs
-Job IDs and job management
-Cancel/pause/resume functionality
-Better logging
-Configuration files
-Secure credential storage
-Timezone support
-More advanced scheduling rules
-Multiple simultaneous SMTP accounts
-HTML email support
-Richer system-alert integrations
+Jobs exist only while the program is running.
+Closing AUTO-GEAR stops active background jobs.
+Recurring schedules are not persisted.
+There is no GUI.
+There is no database.
+Timezone handling is basic.
+Job cancellation is not currently implemented.
+Credentials are not stored in an encrypted credential manager.
+Roadmap
+Scheduling
+ Persistent scheduled jobs
+ Job IDs
+ Cancel jobs
+ Pause/resume jobs
+ More scheduling options
+ Timezone support
+Email
+ HTML email support
+ Email templates
+ Multiple attachments
+ Improved recipient management
+ Additional SMTP providers
+Application
+ Configuration file
+ Better logging
+ Persistent job database
+ Improved CLI
+ GUI
 AI-Assisted Development
 
-Some portions of AUTO-GEAR were developed or refined with AI assistance.
+Parts of AUTO-GEAR were written or refined with AI assistance.
 
-The overall project structure, concept, implementation direction, and core framework were developed by the author. AI assistance was used for portions of the code and experimentation.
-
-The repository is intended to document the project as it develops rather than represent every line as entirely manually written.
+The AI-assisted portions are part of the development process, but the project concept, architecture, structure, and core direction were developed by the author.
 
 License
 
@@ -345,12 +256,13 @@ This project is licensed under the MIT License.
 
 See LICENSE for details.
 
-Disclaimer
+Final
 
-AUTO-GEAR is intended for legitimate email automation, notification, and system-alert use.
+AUTO-GEAR is built around a simple idea:
 
-Users are responsible for complying with the terms of service of their SMTP provider and all applicable laws and regulations.
+Create an email.
+Choose when it runs.
+Let the local machine handle it.
 
-Author
 
-Developed as a local email automation project originally built for network monitoring and alerting.
+It started as a network-alert script and is being developed into a broader local email automation tool.
