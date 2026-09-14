@@ -1,4 +1,3 @@
-Got it — **no roadmap section**. Keep it simple and focused on what AUTO-GEAR currently does.
 
 # AUTO-GEAR
 
